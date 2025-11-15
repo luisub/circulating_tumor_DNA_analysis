@@ -10,7 +10,7 @@ This code is based on [Circulating tumor DNA sequencing in colorectal cancer pat
 
 This code aims to identify potential variant allele frequency changes that serve as biomarkers for monitoring treatment response and tumor evolution.
 
-<img src="docs/img.png" alt="VCA pipeline" width="900" />
+<img src="docs/image.png" alt="VCA pipeline" width="900" />
 
 
 # Pipeline is located in:
