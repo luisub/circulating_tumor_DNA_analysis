@@ -24,7 +24,7 @@ To install this repository and all its dependencies, we recommend using [Anacond
 
 * Clone the repository:
 ```sh
-git clone https://github.com/luisub/circulatory_tumor_DNA_analysis.git
+git clone https://github.com/luisub/circulating_tumor_DNA_analysis.git
 ```
 
 * Create a virtual environment from the `environment.yml` file and activate it:
@@ -32,6 +32,4 @@ git clone https://github.com/luisub/circulatory_tumor_DNA_analysis.git
 conda env create -f environment.yml
 conda activate vca_env
 ```
-
-
 
