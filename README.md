@@ -22,7 +22,10 @@ This code aims to identify potential variant allele frequency changes that serve
 
 **[TODO List](TODO.md)** - Comprehensive development roadmap with prioritized tasks.
 
-**[PCR/NGS Diagnostics Roadmap](dev/simulating_PCR.ipynb)** - PCR design for clinical diagnostic development.
+**[PCR/NGS Diagnostics Roadmap](dev/pcr_design_simulation.ipynb)** - PCR design for clinical diagnostic development.
+
+<img src="docs/KRAS_mut_gel_electrophoresis.png" alt="VCA pipeline" width="300" />
+
 
 
 
