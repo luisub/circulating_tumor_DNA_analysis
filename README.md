@@ -56,7 +56,7 @@ conda activate vca_env
 ```
 
 ```
-ctDNA_analysis/
+ctDNA_analysis - Code Architecture/
 ├── 📁 src/                                                   # Core source code
 │   ├── main_code.py                                          # (development)
 │   └── 📁 utils/                                             # Utility functions
@@ -64,10 +64,11 @@ ctDNA_analysis/
 ├── 📁 pipelines/                                             # (development) Complete analysis workflows
 │   ├── single_patient_pipeline.py                            # End-to-end single patient analysis (development)
 │   └── batch_processing_pipeline.py                          # Multi-patient batch processing (planned)
-├── 📁 notebooks/                                             # Jupyter notebooks
+├── 📁 dev/                                                   # (development) Simulation analysis
+│   ├── pcr_design_simulation.ipynb                           # Simulating PCR diagnostic assay (development)
+│   └── pcr_visualization.py                                  # Visualize PCR gel (development)
+├── 📁 notebooks/                                             # (Future re-organization) Jupyter notebooks 
 │   ├── variant_calling_analysis_cleaned.ipynb                # Main analysis notebook
-│   └── 📁 dev/                                               # Development notebooks
-│       └── simulating_PCR.ipynb                              # PCR simulation experiments
 ├── 📁 docs/                                                  # Documentation
 │   ├── user_guide.md                                         # Complete user manual (planned)
 │   ├── TODO.md                                               # Development roadmap 
