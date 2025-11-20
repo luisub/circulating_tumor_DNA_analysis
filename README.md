@@ -1,4 +1,6 @@
-# Variant Calling Analysis  
+# ctDNA Biomarker Toolkit
+
+**NGS Variant Calling & Digital PCR Assay Design for Circulating Tumor DNA Analysis**
 
 **Author:** Luis Aguilera
 
@@ -8,7 +10,7 @@
 ## Description:
 This code is based on [Circulating tumor DNA sequencing in colorectal cancer patients treated with first-line chemotherapy with anti-EGFR.](https://www.nature.com/articles/s41598-021-95345-4). 
 
-This code aims to identify potential variant allele frequency changes that serve as biomarkers for monitoring treatment response and tumor evolution.
+This code aims to identify potential variant allele frequency changes that serve as biomarkers for monitoring treatment response and tumor evolution. Then, Digital PCR Assay Development is implemented based on variant allele detection.
 
 <img src="docs/image.png" alt="VCA pipeline" width="900" />
 
