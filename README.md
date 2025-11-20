@@ -24,7 +24,7 @@ This code aims to identify potential variant allele frequency changes that serve
 
 ## Digital PCR Assay Design
 
-**[dPCR Design Notebook (development)](dev/dpcr_design_simulation.ipynb)** - Simulate digital PCR assays for absolute quantification of ctDNA.
+**[dPCR Design Notebook (development)](dev/dpcr_rare_mutation_detection.ipynb)** - Simulate digital PCR assays for absolute quantification of ctDNA.
 
 **Features:**
 - Allele-specific probe design (FAM/VIC dual-color assays)
