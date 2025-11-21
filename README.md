@@ -1,4 +1,4 @@
-# ctDNA Biomarker Toolkit
+# ctDNA Biomarker Discovery Toolkit
 
 **NGS Variant Calling & Digital PCR Assay Design for Circulating Tumor DNA Analysis**
 
