@@ -22,19 +22,19 @@ This code aims to identify potential variant allele frequency changes that serve
 
 ## Droplet Digital PCR  (ddPCR) Assay Design
 
-**[ddPCR Design Notebook (development)](dev/dpcr_rare_mutation_detection.ipynb)** - Simulate Droplet Digital PCR assays for absolute quantification of ctDNA.
+**[ddPCR Design Notebook (development)](digital_PCR/dpcr_rare_mutation_detection.ipynb)** - Simulate Droplet Digital PCR assays for absolute quantification of ctDNA.
 
 - Allele-specific probe design (FAM/VIC dual-color assays)
 - Droplet partitioning simulation using Poisson statistics
 - Limit of detection (LOD) calculations (down to 0.01% VAF)
 - 1D Amplitude plots
 
-<img src="dev/ddpcr_publication_vaf_5.0.png" alt="VCA pipeline" width="600" />
+<img src="digital_PCR/ddpcr_publication_vaf_5.0.png" alt="VCA pipeline" width="600" />
 
 
 ## PCR Assay Design
 
-**[PCR Diagnostics](dev/pcr_design_simulation.ipynb)** - PCR design for clinical diagnostic development.
+**[PCR Diagnostics](digital_PCR/pcr_design_simulation.ipynb)** - PCR design for clinical diagnostic development.
 
 <img src="docs/KRAS_mut_gel_electrophoresis.png" alt="VCA pipeline" width="300" />
 
