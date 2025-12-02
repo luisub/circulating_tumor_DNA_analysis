@@ -46,59 +46,7 @@ class NanoplateVisualizer:
             partition_status = partition_status[:total_cells]
         return partition_status.reshape(rows, cols)
     
-    # def plot_nanoplate(self, data_dict: Dict, title: str = None, 
-    #                   figsize: Tuple[int, int] = (12, 8)) -> Tuple:
-    #     """Generate nanoplate visualization with partition grid."""
-    #     partition_array = self.create_partition_array(data_dict)
-    #     fig, ax = plt.subplots(figsize=figsize, facecolor='black')
-    #     ax.set_facecolor('black')
-    #     colors_list = ['#000000', self.COLORS['negative'], self.COLORS['fam_only'], 
-    #                   self.COLORS['vic_only'], self.COLORS['double_positive']]
-    #     cmap = ListedColormap(colors_list)
-    #     im = ax.imshow(partition_array, cmap=cmap, aspect='equal',
-    #                   vmin=-1, vmax=3, interpolation='nearest')
-    #     rows, cols = partition_array.shape
-    #     if rows < 100:
-    #         for i in range(rows + 1):
-    #             ax.axhline(i - 0.5, color=self.COLORS['grid_line'], linewidth=0.5, alpha=0.3)
-    #         for j in range(cols + 1):
-    #             ax.axvline(j - 0.5, color=self.COLORS['grid_line'], linewidth=0.5, alpha=0.3)
-    #     ax.set_xticks([])
-    #     ax.set_yticks([])
-    #     for spine in ax.spines.values():
-    #         spine.set_edgecolor(self.COLORS['border'])
-    #         spine.set_linewidth(2)
-    #     legend_elements = [
-    #         mpatches.Patch(facecolor=self.COLORS['negative'], edgecolor='white', linewidth=0.5,
-    #                       label=f"Negative ({data_dict['n_negative']:,})"),
-    #         mpatches.Patch(facecolor=self.COLORS['fam_only'], edgecolor='white', linewidth=0.5,
-    #                       label=f"Mutant Only ({data_dict['n_fam_only']:,})"),
-    #         mpatches.Patch(facecolor=self.COLORS['vic_only'], edgecolor='white', linewidth=0.5,
-    #                       label=f"Wildtype Only ({data_dict['n_vic_only']:,})"),
-    #         mpatches.Patch(facecolor=self.COLORS['double_positive'], edgecolor='black', linewidth=0.5,
-    #                       label=f"Both Targets ({data_dict['n_double_positive']:,})")
-    #     ]
-    #     legend = ax.legend(handles=legend_elements, loc='upper left', bbox_to_anchor=(1.02, 1), 
-    #              frameon=True, fontsize=10, title='Partition Status', title_fontsize=11, 
-    #              facecolor='#1a1a1a', edgecolor='white')
-    #     plt.setp(legend.get_texts(), color='white')
-    #     plt.setp(legend.get_title(), color='white')
-    #     if title:
-    #         title_text = title
-    #     else:
-    #         vaf_measured = data_dict.get('vaf_measured', 0)
-    #         title_text = f"ddPCR Nanoplate - VAF: {vaf_measured:.3f}%"
-    #     ax.set_title(title_text, fontsize=14, fontweight='bold', pad=20, color='white')
-    #     total_positive = (data_dict['n_fam_only'] + data_dict['n_vic_only'] + 
-    #                      data_dict['n_double_positive'])
-    #     summary_text = (f"Total Partitions: {data_dict['n_droplets']:,}\n"
-    #                    f"Positive: {total_positive:,} ({100*total_positive/data_dict['n_droplets']:.1f}%)\n"
-    #                    f"Negative: {data_dict['n_negative']:,}")
-    #     ax.text(0.02, 0.98, summary_text, transform=ax.transAxes, fontsize=9,
-    #            verticalalignment='top', color='white',
-    #            bbox=dict(boxstyle='round', facecolor='#1a1a1a', alpha=0.9, edgecolor='white'))
-    #     plt.tight_layout()
-    #     return fig, ax
+
     def plot_nanoplate(self, data_dict: Dict, title: str = None, 
                     figsize: Tuple[int, int] = (12, 8)) -> Tuple:
         """Generate nanoplate visualization with partition grid."""
@@ -253,83 +201,7 @@ class NanoplateVisualizer:
         return fig, axes
 
 
-# def create_publication_figure(data_dict: Dict, output_path: str = None) -> Tuple:
-#     """Create publication-quality figure combining nanoplate and amplitude plots."""
-#     visualizer = NanoplateVisualizer(n_droplets=data_dict['n_droplets'])
-#     fig = plt.figure(figsize=(16, 10), facecolor='black')
-#     fig.patch.set_facecolor('black')
-#     gs = fig.add_gridspec(2, 2, height_ratios=[1.2, 1], width_ratios=[1, 1], hspace=0.3, wspace=0.3)
-#     ax_nano = fig.add_subplot(gs[0, :])
-#     ax_nano.set_facecolor('black')
-#     partition_array = visualizer.create_partition_array(data_dict)
-#     colors_list = ['#000000', visualizer.COLORS['negative'], visualizer.COLORS['fam_only'],
-#                   visualizer.COLORS['vic_only'], visualizer.COLORS['double_positive']]
-#     cmap = ListedColormap(colors_list)
-#     ax_nano.imshow(partition_array, cmap=cmap, aspect='equal', vmin=-1, vmax=3, interpolation='nearest')
-#     ax_nano.set_xticks([])
-#     ax_nano.set_yticks([])
-#     for spine in ax_nano.spines.values():
-#         spine.set_edgecolor(visualizer.COLORS['border'])
-#         spine.set_linewidth(2)
-#     vaf_measured = data_dict.get('vaf_measured', 0)
-#     ax_nano.set_title(f'ddPCR Nanoplate Visualization - VAF: {vaf_measured:.3f}%',
-#                      fontsize=14, fontweight='bold', pad=15, color='white')
-#     legend_elements = [
-#         mpatches.Patch(facecolor=visualizer.COLORS['negative'], edgecolor='white', linewidth=0.5,
-#                       label=f"Negative ({data_dict['n_negative']:,})"),
-#         mpatches.Patch(facecolor=visualizer.COLORS['fam_only'], edgecolor='white', linewidth=0.5,
-#                       label=f"Mutant ({data_dict['n_fam_only']:,})"),
-#         mpatches.Patch(facecolor=visualizer.COLORS['vic_only'], edgecolor='white', linewidth=0.5,
-#                       label=f"Wildtype ({data_dict['n_vic_only']:,})"),
-#         mpatches.Patch(facecolor=visualizer.COLORS['double_positive'], edgecolor='black', linewidth=0.5,
-#                       label=f"Both ({data_dict['n_double_positive']:,})")
-#     ]
-#     legend = ax_nano.legend(handles=legend_elements, loc='center left', bbox_to_anchor=(1.02, 0.5),
-#                   frameon=True, fontsize=10, facecolor='#1a1a1a', edgecolor='white')
-#     plt.setp(legend.get_texts(), color='white')
-#     ax_fam = fig.add_subplot(gs[1, 0])
-#     ax_fam.set_facecolor('black')
-#     fluorescence_fam = data_dict['fam_fluorescence']
-#     positive_mask_fam = data_dict['fam_positive']
-#     threshold_fam = 3500
-#     event_numbers = np.arange(len(fluorescence_fam))
-#     ax_fam.scatter(event_numbers[~positive_mask_fam], fluorescence_fam[~positive_mask_fam],
-#                   c='#404040', s=2, alpha=0.3, label='Negative')
-#     ax_fam.scatter(event_numbers[positive_mask_fam], fluorescence_fam[positive_mask_fam],
-#                   c='#FF00FF', s=2, alpha=0.6, label='Positive')
-#     ax_fam.axhline(threshold_fam, color='red', linestyle='--', linewidth=2, label='Threshold')
-#     ax_fam.set_xlabel('Event Number', fontweight='bold', color='white')
-#     ax_fam.set_ylabel('FAM Amplitude', fontweight='bold', color='white')
-#     ax_fam.set_title('FAM Channel (Mutant)', fontweight='bold', color='white')
-#     legend_fam = ax_fam.legend(loc='upper right', fontsize=8, facecolor='#1a1a1a', edgecolor='white')
-#     plt.setp(legend_fam.get_texts(), color='white')
-#     ax_fam.grid(True, alpha=0.3, color='#404040')
-#     ax_fam.tick_params(colors='white')
-#     for spine in ax_fam.spines.values():
-#         spine.set_edgecolor('white')
-#     ax_vic = fig.add_subplot(gs[1, 1])
-#     ax_vic.set_facecolor('black')
-#     fluorescence_vic = data_dict['vic_fluorescence']
-#     positive_mask_vic = data_dict['vic_positive']
-#     threshold_vic = 3500
-#     ax_vic.scatter(event_numbers[~positive_mask_vic], fluorescence_vic[~positive_mask_vic],
-#                   c='#404040', s=2, alpha=0.3, label='Negative')
-#     ax_vic.scatter(event_numbers[positive_mask_vic], fluorescence_vic[positive_mask_vic],
-#                   c='#00FF00', s=2, alpha=0.6, label='Positive')
-#     ax_vic.axhline(threshold_vic, color='red', linestyle='--', linewidth=2, label='Threshold')
-#     ax_vic.set_xlabel('Event Number', fontweight='bold', color='white')
-#     ax_vic.set_ylabel('VIC Amplitude', fontweight='bold', color='white')
-#     ax_vic.set_title('VIC Channel (Wildtype)', fontweight='bold', color='white')
-#     legend_vic = ax_vic.legend(loc='upper right', fontsize=8, facecolor='#1a1a1a', edgecolor='white')
-#     plt.setp(legend_vic.get_texts(), color='white')
-#     ax_vic.grid(True, alpha=0.3, color='#404040')
-#     ax_vic.tick_params(colors='white')
-#     for spine in ax_vic.spines.values():
-#         spine.set_edgecolor('white')
-#     if output_path:
-#         plt.savefig(output_path, dpi=300, bbox_inches='tight')
-#         print(f"Figure saved: {output_path}")
-#     return fig, (ax_nano, ax_fam, ax_vic)
+
 
 
 def create_publication_figure(data_dict: Dict, output_path: str = None) -> Tuple:
