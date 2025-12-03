@@ -20,10 +20,23 @@ This code aims to identify potential variant allele frequency changes that serve
 
 **Source:** NCBI SRA BioProject [PRJNA714799](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA714799)
 
-**Samples:** Circulating tumor DNA from colorectal cancer patients collected at multiple timepoints:
-- Pre-treatment (baseline)
-- During treatment (first follow-up)
-- Post-treatment (final timepoint)
+**Access & Organization:**
+The pipeline uses `pysradb` to fetch metadata and parses the `run_alias` field to organize samples. The data structure is derived as follows:
+
+- **Sample Types**:
+    - `PBMC`: Germline control (e.g., `PBMC_CTC030`)
+    - `FFPE`: Tumor tissue (e.g., `FFPE_CTC030`)
+    - `ctDNA`: Plasma samples (e.g., `CTC030-1`)
+
+- **Patient IDs**: Extracted from the alias prefix (e.g., `CTC030`, `C_fw01`).
+
+- **Timepoints**:
+    - **Baseline (Pre-treatment)**: No suffix or `-0` (e.g., `CTC030`).
+    - **Follow-up (During/Post)**: Integer suffixes (e.g., `-1`, `-2`).
+    - **Clinical Annotation**: Timepoints are automatically mapped to:
+        - `Pre-treatment`: Baseline (0)
+        - `During treatment`: First follow-up
+        - `Post-treatment`: Final timepoint
 
 
 
