@@ -5,23 +5,100 @@ import re
 from pathlib import Path
 from collections import defaultdict
 from matplotlib.lines import Line2D
+import requests
+import gzip
 
-def plot_protein_mutations(gene_name, vcf_files, protein_length=188, output_file="protein_mutations.png"):
+def fetch_protein_features_from_uniprot(gene_name):
+    """
+    Fetches protein domains from UniProt API.
+    """
+    print(f"Fetching protein data for {gene_name} from UniProt API...")
+    # 1. Search for UniProt ID
+    search_url = "https://rest.uniprot.org/uniprotkb/search"
+    params = {
+        "query": f"gene_exact:{gene_name} AND organism_id:9606 AND reviewed:true",
+        "format": "json",
+        "fields": "accession,length,features"
+    }
+    
+    try:
+        r = requests.get(search_url, params=params)
+        if not r.ok:
+            print(f"UniProt search failed: {r.status_code}")
+            return [], None
+            
+        results = r.json().get('results', [])
+        if not results:
+            print(f"No UniProt entry found for {gene_name}")
+            return [], None
+            
+        # Take the first result (canonical)
+        entry = results[0]
+        length = entry['sequence']['length']
+        features_data = entry.get('features', [])
+        
+        graphic_features = [
+            GraphicFeature(start=0, end=length, strand=+1, color="#f0f0f0", label=f"{gene_name} Protein")
+        ]
+        
+        # Map UniProt feature types to colors
+        color_map = {
+            'Domain': '#ccffcc',
+            'Region': '#ccccff',
+            'Motif': '#ffcccc',
+            'Binding site': '#ffffcc'
+        }
+        
+        for ft in features_data:
+            ft_type = ft['type']
+            if ft_type in ['Domain', 'Region', 'Motif', 'Binding site']:
+                start = int(ft['location']['start']['value'])
+                end = int(ft['location']['end']['value'])
+                desc = ft.get('description', ft_type)
+                color = color_map.get(ft_type, '#eeeeee')
+                
+                graphic_features.append(
+                    GraphicFeature(start=start, end=end, strand=+1, color=color, label=desc)
+                )
+                
+        print(f"Successfully fetched {len(graphic_features)-1} features for {gene_name} from UniProt.")
+        return graphic_features, length
+        
+    except Exception as e:
+        print(f"Error fetching from UniProt: {e}")
+        return [], None
+
+def get_protein_features(gene_name, protein_length=None):
+    """
+    Retrieve protein domains/features for a given gene.
+    Tries UniProt first, then falls back to generic.
+    """
+    # Try UniProt
+    features, length = fetch_protein_features_from_uniprot(gene_name)
+    
+    if features:
+        return features, length
+        
+    # Generic fallback
+    if protein_length is None: protein_length = 500 # Default fallback
+    features = [
+        GraphicFeature(start=0, end=protein_length, strand=+1, color="#f0f0f0", label=f"{gene_name} Protein")
+    ]
+    return features, protein_length
+
+def plot_protein_mutations(gene_name, vcf_files, protein_features, protein_length=None, output_file="protein_mutations.png"):
     """
     Visualizes mutations on the protein structure.
+    Args:
+        gene_name (str): Name of the gene (e.g., "KRAS")
+        vcf_files (dict): Dictionary of {sample_label: vcf_path}
+        protein_features (list): List of GraphicFeature objects.
+        protein_length (int): Length of protein in AA.
+        output_file (str): Output filename
     """
     print(f"Generating protein plot for {gene_name}...")
     
-    # Define KRAS Protein Domains (UniProt P01116)
-    features = [
-        GraphicFeature(start=0, end=188, strand=+1, color="#f0f0f0", label="KRAS Protein"),
-        GraphicFeature(start=10, end=17, strand=+1, color="#ffcccc", label="P-loop"),
-        GraphicFeature(start=30, end=38, strand=+1, color="#ccffcc", label="Switch I"),
-        GraphicFeature(start=59, end=67, strand=+1, color="#ccccff", label="Switch II"),
-        GraphicFeature(start=166, end=185, strand=+1, color="#ffffcc", label="Hypervariable")
-    ]
-    
-    record = GraphicRecord(sequence_length=protein_length, features=features)
+    record = GraphicRecord(sequence_length=protein_length, features=protein_features)
     
     # Parse VCFs for Protein Changes
     protein_variants = []
@@ -41,10 +118,10 @@ def plot_protein_mutations(gene_name, vcf_files, protein_length=188, output_file
                 ann_list = rec.info['ANN']
                 for ann in ann_list:
                     parts = ann.split('|')
-                    # Check if it's a protein coding transcript for KRAS
+                    # Check if it's a protein coding transcript for target gene
                     # ANN format: Allele|Annotation|Impact|Gene Name|Gene ID|Feature Type|Feature ID|Transcript Type|Rank|HGVS.c|HGVS.p|...
                     # Index 3 is Gene Name, Index 10 is HGVS.p
-                    if len(parts) > 10 and parts[3] == 'KRAS' and 'p.' in parts[10]:
+                    if len(parts) > 10 and parts[3] == gene_name and 'p.' in parts[10]:
                         p_change = parts[10]
                         # Extract position (e.g., p.Gly12Asp -> 12)
                         match = re.search(r'(\d+)', p_change)
@@ -107,8 +184,7 @@ def plot_protein_mutations(gene_name, vcf_files, protein_length=188, output_file
 
     return grouped_variants
 
-import gzip
-import requests
+
 
 def fetch_gene_features_from_ensembl(gene_name):
     """
@@ -311,19 +387,14 @@ def plot_gene_and_variants(gene_name, vcf_files, genome_path=None, gff_path=None
                 region_start = int(start - padding)
                 region_end = int(end + padding)
     
-    # 3. Fallback to hardcoded KRAS if still no features
-    if not features and gene_name == "KRAS":
-        print("Using hardcoded KRAS coordinates as fallback.")
+    # 3. Fallback to generic if still no features
+    if not features:
+        print(f"Warning: Could not fetch gene structure for {gene_name}. Using generic placeholder.")
+        # Create a generic placeholder
+        region_len = region_end - region_start
         features = [
-            GraphicFeature(start=25250803, end=25250929, strand=-1, color="#ccccff", label="Exon 1"),
-            GraphicFeature(start=25245274, end=25245395, strand=-1, color="#ccccff", label="Exon 2"),
-            GraphicFeature(start=25227259, end=25227437, strand=-1, color="#ccccff", label="Exon 3"),
-            GraphicFeature(start=25225627, end=25225786, strand=-1, color="#ccccff", label="Exon 4")
+             GraphicFeature(start=region_start, end=region_end, strand=+1, color="#f0f0f0", label=f"{gene_name} Region")
         ]
-        if not genomic_region:
-            region_start = 25200000
-            region_end = 25260000
-            chromosome = "12"
 
     if not features:
         print(f"Error: Could not determine gene structure for {gene_name}. Please provide a GFF file or ensure internet access for Ensembl API.")

@@ -20,11 +20,11 @@ import requests
 import os
 from typing import Dict, List, Tuple
 try:
-    from plots_sequences import plot_gene_and_variants
+    from plots_sequences import plot_gene_and_variants, plot_protein_mutations, get_protein_features
 except ImportError:
     # Handle case where script is run from different directory
     sys.path.append(str(Path(__file__).parent))
-    from plots_sequences import plot_gene_and_variants
+    from plots_sequences import plot_gene_and_variants, plot_protein_mutations, get_protein_features
 
 class VCAConfig:
     """Configuration manager for VCA pipeline."""
@@ -433,6 +433,7 @@ class VCAPipeline:
                     vcf_files[label] = str(vcf_path)
             
             if vcf_files:
+                # 1. Gene Structure Plot
                 output_plot = self.config.results_dir / 'gene_variants_plot.png'
                 plot_gene_and_variants(
                     gene_name=gene_name,
@@ -441,8 +442,21 @@ class VCAPipeline:
                     output_file=str(output_plot)
                 )
                 print(f"[OK] Visualization saved: gene_variants_plot.png")
+
+                # 2. Protein Mutation Plot
+                output_protein_plot = self.config.results_dir / 'protein_mutations.png'
+                features, length = get_protein_features(gene_name)
+                plot_protein_mutations(
+                    gene_name=gene_name,
+                    vcf_files=vcf_files,
+                    protein_features=features,
+                    protein_length=length,
+                    output_file=str(output_protein_plot)
+                )
+                print(f"[OK] Visualization saved: protein_mutations.png")
+
         except Exception as e:
-            print(f"[WARNING] Failed to generate gene plot: {e}")
+            print(f"[WARNING] Failed to generate plots: {e}")
     
     def save_results(self, variants_df: pd.DataFrame, candidate_variants: pd.DataFrame,
                     summary_stats: Dict):
