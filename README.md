@@ -91,7 +91,6 @@ ctDNA_analysis - Code Architecture/
 ├── 📁 digital_PCR/                                           # Digital PCR & Primer Design
 │   ├── ddpcr_primer_design.ipynb                             # ddPCR SNP assay design notebook
 │   ├── ddpcr_simulation.ipynb                                # ddPCR simulation notebook
-│   ├── pcr_design_simulation.ipynb                           # PCR diagnostic simulation
 │   ├── pcr_visualization.py                                  # Visualization utilities
 │   ├── dpcr_nanoplate_visualization.py                       # Nanoplate visualization
 │   └── ddpcr_snp_assays.csv                                  # Output: Designed assays
