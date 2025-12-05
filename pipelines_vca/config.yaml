@@ -1,0 +1,23 @@
+paths:
+  base_dir: "/Users/nzlab-la/Desktop/NGS_biomarker_discovery_toolkit/pipelines_vca"
+
+data_source:
+  bioproject_id: "PRJNA1050672"
+  patient_id_filter: "CTC030"
+
+reference_genome:
+  url: "http://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz"
+  filename: "Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz"
+
+processing:
+  threads: 4
+
+variant_calling:
+  target_gene:
+    name: "KRAS"
+    chromosome: "12"
+    start: 25205246
+    end: 25250936
+  filters:
+    min_depth: 20
+    min_allele_frequency: 0.01

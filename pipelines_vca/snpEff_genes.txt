@@ -1,0 +1,6 @@
+# The following table is formatted as tab separated values. 
+#GeneName	GeneId	TranscriptId	BioType	variants_impact_MODERATE	variants_impact_MODIFIER	variants_effect_downstream_gene_variant	variants_effect_intron_variant	variants_effect_missense_variant	variants_effect_non_coding_transcript_exon_variant	variants_effect_splice_region_variant
+KRAS	ENSG00000133703	ENST00000256078	protein_coding	2	0	0	0	2	0	1
+KRAS	ENSG00000133703	ENST00000311936	protein_coding	2	0	0	0	2	0	1
+KRAS	ENSG00000133703	ENST00000557334	protein_coding	0	2	0	2	0	0	0
+RP11-295I5.4	ENSG00000275197	ENST00000620933	antisense	0	2	1	0	0	1	0

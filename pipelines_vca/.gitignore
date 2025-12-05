@@ -1,0 +1,13 @@
+# Python
+
+__pycache__/
+*.pyc
+
+# Data
+data/
+data_cluster/
+
+# IDE
+.DS_Store
+.vscode/
+.idea/

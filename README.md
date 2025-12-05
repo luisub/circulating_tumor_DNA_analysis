@@ -66,7 +66,7 @@ The analysis follows a 3-step process. Each step corresponds to a specific noteb
 
 ### 1. Variant Calling Analysis
 **Goal**: Identify somatic variants (SNPs/Indels) from NGS data.
-- **Notebook**: [vca_pipeline_improved.ipynb](pipelines_vca/vca_pipeline_improved.ipynb)
+- **Notebook**: [vca_pipeline.ipynb](pipelines_vca/vca_pipeline.ipynb)
 - **Directory**: `pipelines_vca/`
 - **Output**: Annotated VCF files (`pipelines_vca/data/variants/*.lofreq.ann.vcf.gz`).
 
@@ -105,8 +105,7 @@ The analysis follows a 3-step process. Each step corresponds to a specific noteb
 ```
 ctDNA_analysis - Code Architecture/
 ├── 📁 pipelines_vca/                                         # Variant Calling Analysis Pipeline
-│   ├── vca_pipeline_improved.ipynb                           # Main pipeline notebook
-│   ├── vca_pipeline.ipynb                                    # (Legacy) Original pipeline notebook
+│   ├── vca_pipeline.ipynb                                    # Main pipeline notebook
 │   ├── run_vca_pipeline.py                                   # Main pipeline script (FastQC, fastp, Lofreq, SnpEff)
 │   ├── run_pipeline.sh                                       # Pipeline launcher script
 │   ├── plots_sequences.py                                    # Protein mutation visualization

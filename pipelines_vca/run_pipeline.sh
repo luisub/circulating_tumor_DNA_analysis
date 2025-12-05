@@ -1,5 +1,6 @@
 #!/bin/bash
 # VCA Pipeline Launcher
+# Launches the pipeline described in vca_pipeline.ipynb
 
 set -e
 

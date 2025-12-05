@@ -434,13 +434,65 @@ def plot_gene_and_variants(gene_name, vcf_files, genome_path=None, gff_path=None
         
         # Fetch and plot variants
         try:
-            # Ensure chromosome matches VCF format (e.g., "12" vs "chr12")
-            # Try both if fetch fails
-            try:
-                variants = list(vcf.fetch(chromosome, region_start, region_end))
-            except ValueError:
-                alt_chrom = f"chr{chromosome}" if not chromosome.startswith("chr") else chromosome.replace("chr", "")
-                variants = list(vcf.fetch(alt_chrom, region_start, region_end))
+            # Smart contig matching
+            contig_match = None
+            
+            # If header has contigs, try to match
+            if list(vcf.header.contigs):
+                if chromosome in vcf.header.contigs:
+                    contig_match = chromosome
+                elif f"chr{chromosome}" in vcf.header.contigs:
+                    contig_match = f"chr{chromosome}"
+                elif chromosome.replace("chr", "") in vcf.header.contigs:
+                    contig_match = chromosome.replace("chr", "")
+                
+                if contig_match:
+                    variants = list(vcf.fetch(contig_match, region_start, region_end))
+                else:
+                    print(f"Warning: Contig '{chromosome}' not found in VCF header.")
+                    variants = []
+            else:
+                # Fallback: Use TabixFile which ignores header validation
+                # print(f"Info: VCF header missing contigs. Using TabixFile fallback for {label}...")
+                vcf.close() # Close VariantFile
+                
+                tbx = pysam.TabixFile(str(vcf_path))
+                variants = []
+                
+                # Try '12' then 'chr12'
+                for c in [chromosome, f"chr{chromosome}"]:
+                    try:
+                        # Fetch raw lines
+                        rows = tbx.fetch(c, region_start, region_end)
+                        for row in rows:
+                            # Manually parse VCF line to create a mock object or simple dict
+                            # VCF: CHROM POS ID REF ALT QUAL FILTER INFO ...
+                            cols = row.split('\t')
+                            rec_pos = int(cols[1])
+                            rec_ref = cols[3]
+                            rec_alt = cols[4]
+                            
+                            # Create a simple object compatible with the plotting loop
+                            class MockVariant:
+                                def __init__(self, pos, ref, alt):
+                                    self.pos = pos
+                                    self.ref = ref
+                                    self.alts = [alt] # simplified
+                            
+                            variants.append(MockVariant(rec_pos, rec_ref, rec_alt))
+                        
+                        if variants: # If found, stop trying other contig names
+                            break 
+                    except ValueError:
+                        continue
+                
+                if not variants:
+                    print(f"Warning: Could not fetch variants for {chromosome} using Tabix fallback.")
+
+        except Exception as e:
+            print(f"Error fetching variants for {label}: {e}")
+            variants = []
+
         except Exception as e:
             print(f"Error fetching variants for {label}: {e}")
             variants = []

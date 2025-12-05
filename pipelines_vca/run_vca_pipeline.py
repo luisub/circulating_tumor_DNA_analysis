@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Variant Calling Analysis Pipeline for Circulating Tumor DNA
+Implements the pipeline described in vca_pipeline.ipynb
 by: Luis Aguilera, December 2, 2025.
 """
 
@@ -97,6 +98,45 @@ class VCAPipeline:
             return True
         cmd = ['bwa', 'index', str(ref_path)]
         return self.run_command(cmd, "BWA index creation")
+
+    def download_dbsnp(self) -> Path:
+        """Download common dbSNP VCF for GRCh38."""
+        dbsnp_vcf = self.config.reference_dir / "common_all_20180418.vcf.gz"
+        dbsnp_tbi = self.config.reference_dir / "common_all_20180418.vcf.gz.tbi"
+        
+        if dbsnp_vcf.exists() and dbsnp_tbi.exists():
+            print(f"[SKIP] dbSNP files already exist")
+            return dbsnp_vcf
+            
+        print(f"Downloading dbSNP common variants...")
+        dbsnp_url = "https://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606_b151_GRCh38p7/VCF/common_all_20180418.vcf.gz"
+        dbsnp_tbi_url = "https://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606_b151_GRCh38p7/VCF/common_all_20180418.vcf.gz.tbi"
+        
+        try:
+            # Download VCF
+            print(f"Downloading VCF from {dbsnp_url}...")
+            with requests.get(dbsnp_url, stream=True) as r:
+                r.raise_for_status()
+                with open(dbsnp_vcf, 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        f.write(chunk)
+            
+            # Download Index
+            print(f"Downloading Index from {dbsnp_tbi_url}...")
+            with requests.get(dbsnp_tbi_url, stream=True) as r:
+                r.raise_for_status()
+                with open(dbsnp_tbi, 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                        
+            print("[OK] dbSNP download completed")
+            return dbsnp_vcf
+        except Exception as e:
+            print(f"[WARNING] dbSNP download failed: {e}")
+            if dbsnp_vcf.exists(): dbsnp_vcf.unlink()
+            if dbsnp_tbi.exists(): dbsnp_tbi.unlink()
+            return None
+
     
     def fetch_sra_metadata(self) -> bool:
         """Download SRA metadata for bioproject."""
@@ -255,8 +295,9 @@ class VCAPipeline:
         index_cmd = ['samtools', 'index', str(dedup_path)]
         return self.run_command(index_cmd, f"Dedup BAM indexing {run_id}")
     
-    def call_variants_lofreq(self, run_id: str) -> bool:
+    def call_variants_lofreq(self, run_id: str, dbsnp_path: Path = None) -> bool:
         """Call variants using Lofreq."""
+
         ref_path = self.config.reference_dir / self.config.config['reference_genome']['filename']
         bam_path = self.config.aligned_dir / f"{run_id}_dedup.bam"
         vcf_path = self.config.variants_dir / f"{run_id}.lofreq.vcf"
@@ -284,6 +325,10 @@ class VCAPipeline:
             "--call-indels",
             str(bam_indel_path)
         ]
+        
+        if dbsnp_path:
+            cmd_call.extend(["-d", str(dbsnp_path)])
+
         
         return self.run_command(cmd_call, f"Lofreq call {run_id}")
 
@@ -483,7 +528,12 @@ class VCAPipeline:
             return False
         if not self.extract_sample_info():
             return False
+            
+        # Download dbSNP once
+        dbsnp_path = self.download_dbsnp()
+        
         patient_filter = self.config.config['data_source'].get('patient_id_filter', None)
+
         if patient_filter:
             self.sample_info = {k: v for k, v in self.sample_info.items() 
                                if v['patient_id'] == patient_filter}
@@ -502,9 +552,12 @@ class VCAPipeline:
                 continue
             if not self.remove_duplicates(run_id):
                 continue
-            if not self.call_variants_lofreq(run_id):
+            if not self.remove_duplicates(run_id):
+                continue
+            if not self.call_variants_lofreq(run_id, dbsnp_path):
                 continue
             if not self.annotate_variants(run_id):
+
                 continue
                 
         print("\nVARIANT ANALYSIS")
